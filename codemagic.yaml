@@ -34,14 +34,14 @@ workflows:
       flutter: stable
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.tuempresa.equinoscaninos
+        bundle_identifier: com.nasaka.equinoscaninos
 
     scripts:
       - name: Get Flutter packages
         script: |
           flutter pub get
 
-      - name: Build IPA (Release)
+      - name: Build IPA
         script: |
           flutter build ipa --release
 
