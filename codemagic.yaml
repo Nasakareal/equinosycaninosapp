@@ -6,6 +6,10 @@ workflows:
     environment:
       flutter: stable
 
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.TU_BUNDLE_ID_AQUI
+
     scripts:
       - name: Get Flutter packages
         script: |
