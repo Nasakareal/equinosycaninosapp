@@ -1,27 +1,27 @@
 workflows:
-  ios-release:
-    name: iOS Release
+  ios-simulator-preview:
+    name: iOS Simulator App Preview
     max_build_duration: 60
 
     environment:
       flutter: stable
 
-      groups:
-        - app_store_connect
-
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.nasaka.equinoscaninos
-
     scripts:
-      - name: Clean
-        script: flutter clean
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
 
-      - name: Get packages
-        script: flutter pub get
+      - name: Build iOS Simulator App (.app)
+        script: |
+          flutter build ios \
+            --simulator \
+            --debug \
+            --no-codesign
 
-      - name: Build IPA
-        script: flutter build ipa --release --export-method app-store
+      - name: Show output
+        script: |
+          ls -lh build/ios/iphonesimulator/
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/ios/iphonesimulator/*.app
+      - build/ios/iphonesimulator/Runner.app
