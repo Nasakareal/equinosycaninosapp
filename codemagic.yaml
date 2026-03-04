@@ -8,7 +8,7 @@ workflows:
 
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.TU_BUNDLE_ID_AQUI
+        bundle_identifier: com.nasaka.equinoscaninos
 
     scripts:
       - name: Get Flutter packages
