@@ -5,32 +5,23 @@ workflows:
 
     environment:
       flutter: stable
+
+      groups:
+        - app_store_connect
+
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.nasaka.equinoscaninos
 
     scripts:
-      - name: Flutter pub get
+      - name: Clean
+        script: flutter clean
+
+      - name: Get packages
         script: flutter pub get
 
-      - name: Create export options
-        script: |
-          cat > /Users/builder/exportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
-
-      - name: Build iOS IPA
-        script: |
-          flutter build ipa --release --export-options-plist=/Users/builder/exportOptions.plist
+      - name: Build IPA
+        script: flutter build ipa --release --export-method app-store
 
     artifacts:
       - build/ios/ipa/*.ipa
