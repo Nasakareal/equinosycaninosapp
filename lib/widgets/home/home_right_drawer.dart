@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../core/routes.dart';
+import '../../core/app_theme.dart';
 import '../../services/auth_service.dart';
 import 'glass.dart';
 
@@ -32,21 +34,23 @@ class HomeRightDrawer extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0x24FFFFFF)),
-                    color: const Color(0x0AFFFFFF),
+                    border: Border.all(
+                      color: AppColors.creamStroke.withValues(alpha: 0.28),
+                    ),
+                    color: AppColors.whiteWarm.withValues(alpha: 0.58),
                   ),
                   child: const Row(
                     children: [
                       Icon(
                         Icons.manage_accounts_rounded,
-                        color: Color(0xFFF3F7FF),
+                        color: AppColors.brownDeep,
                       ),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Cuenta',
                           style: TextStyle(
-                            color: Color(0xFFF3F7FF),
+                            color: AppColors.text,
                             fontWeight: FontWeight.w900,
                             fontSize: 14.6,
                           ),
@@ -62,19 +66,19 @@ class HomeRightDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Perfil próximamente')),
+                      const SnackBar(content: Text('Perfil proximamente')),
                     );
                   },
                 ),
                 const SizedBox(height: 10),
                 _MenuTile(
                   icon: Icons.password_rounded,
-                  title: 'Cambiar contraseña',
+                  title: 'Cambiar contrasena',
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Cambio de contraseña próximamente'),
+                        content: Text('Cambio de contrasena proximamente'),
                       ),
                     );
                   },
@@ -82,7 +86,7 @@ class HomeRightDrawer extends StatelessWidget {
                 const Spacer(),
                 _DangerTile(
                   icon: Icons.logout_rounded,
-                  title: 'Cerrar sesión',
+                  title: 'Cerrar sesion',
                   onTap: () async {
                     Navigator.pop(context);
                     await _logout(context);
@@ -117,18 +121,20 @@ class _MenuTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x24FFFFFF)),
-          color: const Color(0x0AFFFFFF),
+          border: Border.all(
+            color: AppColors.creamStroke.withValues(alpha: 0.24),
+          ),
+          color: AppColors.whiteWarm.withValues(alpha: 0.58),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFF3F7FF)),
+            Icon(icon, color: AppColors.brownDeep),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
-                  color: Color(0xFFF3F7FF),
+                  color: AppColors.text,
                   fontWeight: FontWeight.w800,
                   fontSize: 14.2,
                 ),
@@ -161,18 +167,18 @@ class _DangerTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x26FF6B6B)),
-          color: const Color(0x14FF6B6B),
+          border: Border.all(color: AppColors.red.withValues(alpha: 0.30)),
+          color: AppColors.redSoft.withValues(alpha: 0.72),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFFFD6D6)),
+            Icon(icon, color: AppColors.red),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
-                  color: Color(0xFFFFD6D6),
+                  color: AppColors.red,
                   fontWeight: FontWeight.w900,
                   fontSize: 14.2,
                 ),

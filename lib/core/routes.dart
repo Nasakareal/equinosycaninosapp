@@ -6,4 +6,7 @@ class Routes {
   static const String animalsIndex = '/animals';
   static const String animalCreate = '/animals/create';
   static const String animalDetail = '/animals/detail';
+
+  static const String personalsIndex = '/personals';
+  static const String equinoterapiasIndex = '/equinoterapias';
 }

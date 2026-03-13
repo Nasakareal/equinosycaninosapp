@@ -1,3 +1,7 @@
+import 'animal_assignment.dart';
+import 'animal_incidence.dart';
+import 'animal_medical_record.dart';
+
 class Animal {
   final int id;
   final String tipo;
@@ -16,6 +20,10 @@ class Animal {
   final String? edadTexto;
   final double? forrajeKgDiario;
   final double? granoKgDiario;
+  final String? fotoUrl;
+  final List<AnimalAssignment> assignments;
+  final List<AnimalMedicalRecord> medicalRecords;
+  final List<AnimalIncidence> incidences;
 
   const Animal({
     required this.id,
@@ -35,6 +43,10 @@ class Animal {
     this.edadTexto,
     this.forrajeKgDiario,
     this.granoKgDiario,
+    this.fotoUrl,
+    this.assignments = const [],
+    this.medicalRecords = const [],
+    this.incidences = const [],
   });
 
   static double? _toDouble(dynamic v) {
@@ -55,7 +67,20 @@ class Animal {
     return 0;
   }
 
+  static List<T> _listOf<T>(
+    dynamic raw,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final list = (raw as List?) ?? const [];
+    return list
+        .whereType<Map>()
+        .map((e) => fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
   factory Animal.fromJson(Map<String, dynamic> json) {
+    final edad = json['edad_texto'] ?? json['edad_calculada'];
+
     return Animal(
       id: _toInt(json['id']),
       tipo: (json['tipo'] ?? '').toString(),
@@ -71,9 +96,16 @@ class Animal {
       estatus: (json['estatus'] ?? '').toString(),
       observaciones: json['observaciones']?.toString(),
       fechaNacimiento: json['fecha_nacimiento']?.toString(),
-      edadTexto: json['edad_texto']?.toString(),
+      edadTexto: edad?.toString(),
       forrajeKgDiario: _toDouble(json['forraje_kg_diario']),
       granoKgDiario: _toDouble(json['grano_kg_diario']),
+      fotoUrl: json['foto_url']?.toString(),
+      assignments: _listOf(json['assignments'], AnimalAssignment.fromJson),
+      medicalRecords: _listOf(
+        json['medical_records'] ?? json['medicalRecords'],
+        AnimalMedicalRecord.fromJson,
+      ),
+      incidences: _listOf(json['incidences'], AnimalIncidence.fromJson),
     );
   }
 }

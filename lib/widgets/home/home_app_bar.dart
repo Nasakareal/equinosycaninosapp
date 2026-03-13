@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_theme.dart';
 import 'glass.dart';
 
 class HomeAppBar extends StatelessWidget {
@@ -26,9 +28,11 @@ class HomeAppBar extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0x2EFFFFFF)),
+              border: Border.all(
+                color: AppColors.creamStroke.withValues(alpha: 0.28),
+              ),
               gradient: const LinearGradient(
-                colors: [Color(0x3D00E5FF), Color(0x3D7C4DFF)],
+                colors: [Color(0xFFE8DDC8), Color(0xFFD8CFBC)],
               ),
             ),
             child: Image.asset('assets/images/escudo.png', fit: BoxFit.contain),
@@ -43,7 +47,7 @@ class HomeAppBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Color(0xFFF3F7FF),
+                    color: AppColors.text,
                     fontWeight: FontWeight.w900,
                     fontSize: 15.6,
                   ),
@@ -54,7 +58,7 @@ class HomeAppBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Color(0x88FFFFFF),
+                    color: AppColors.muted,
                     fontWeight: FontWeight.w700,
                     fontSize: 12.2,
                   ),
@@ -86,10 +90,12 @@ class _IconTile extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0x24FFFFFF)),
-          color: const Color(0x0AFFFFFF),
+          border: Border.all(
+            color: AppColors.creamStroke.withValues(alpha: 0.28),
+          ),
+          color: AppColors.whiteWarm.withValues(alpha: 0.58),
         ),
-        child: Icon(icon, color: const Color(0xFFF3F7FF)),
+        child: Icon(icon, color: AppColors.brownDeep),
       ),
     );
   }

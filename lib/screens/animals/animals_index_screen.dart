@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+
+import '../../core/app_theme.dart';
 import '../../core/routes.dart';
 import '../../models/animal.dart';
 import '../../models/paginated.dart';
@@ -82,10 +84,11 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
         _error = e.toString().replaceFirst('Exception: ', '');
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -94,8 +97,8 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('¿Eliminar registro?'),
-          content: Text('Se eliminará: ${a.nombre}'),
+          title: const Text('Eliminar registro?'),
+          content: Text('Se eliminara: ${a.nombre}'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -154,23 +157,9 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                   ),
                   child: Row(
                     children: [
-                      InkWell(
+                      _SoftIconButton(
+                        icon: Icons.arrow_back_rounded,
                         onTap: () => Navigator.pop(context),
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0x24FFFFFF)),
-                            color: const Color(0x0AFFFFFF),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back_rounded,
-                            color: Color(0xFFF3F7FF),
-                          ),
-                        ),
                       ),
                       const SizedBox(width: 12),
                       const Expanded(
@@ -179,7 +168,7 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Color(0xFFF3F7FF),
+                            color: AppColors.text,
                             fontWeight: FontWeight.w900,
                             fontSize: 16,
                           ),
@@ -196,9 +185,11 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0x24FFFFFF)),
+                            border: Border.all(
+                              color: AppColors.brown.withValues(alpha: 0.18),
+                            ),
                             gradient: const LinearGradient(
-                              colors: [Color(0x297C4DFF), Color(0x2900E5FF)],
+                              colors: [Color(0xFFA47754), Color(0xFF6F4E38)],
                             ),
                           ),
                           child: const Row(
@@ -206,14 +197,14 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                             children: [
                               Icon(
                                 Icons.add_rounded,
-                                color: Color(0xFFF3F7FF),
+                                color: AppColors.whiteWarm,
                                 size: 18,
                               ),
                               SizedBox(width: 8),
                               Text(
                                 'Agregar',
                                 style: TextStyle(
-                                  color: Color(0xFFF3F7FF),
+                                  color: AppColors.whiteWarm,
                                   fontWeight: FontWeight.w900,
                                   fontSize: 13.2,
                                 ),
@@ -307,7 +298,7 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                               _error!,
                               textAlign: TextAlign.center,
                               style: const TextStyle(
-                                color: Color(0xFFFFD6D6),
+                                color: AppColors.red,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -317,7 +308,7 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                             child: Text(
                               'Sin registros',
                               style: TextStyle(
-                                color: Color(0xB6FFFFFF),
+                                color: AppColors.muted,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -341,7 +332,7 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
                                         ).showSnackBar(
                                           const SnackBar(
                                             content: Text(
-                                              'Editar próximamente',
+                                              'Editar proximamente',
                                             ),
                                           ),
                                         );
@@ -382,6 +373,32 @@ class _AnimalsIndexScreenState extends State<AnimalsIndexScreen> {
   }
 }
 
+class _SoftIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _SoftIconButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 44,
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.24)),
+          color: AppColors.whiteWarm.withValues(alpha: 0.62),
+        ),
+        child: Icon(icon, color: AppColors.brownDeep),
+      ),
+    );
+  }
+}
+
 class _SelectItem {
   final String value;
   final String label;
@@ -409,10 +426,16 @@ class _Select extends StatelessWidget {
         labelText: label,
         border: const OutlineInputBorder(),
       ),
+      dropdownColor: AppColors.cream,
       items: items
           .map(
-            (x) =>
-                DropdownMenuItem<String>(value: x.value, child: Text(x.label)),
+            (x) => DropdownMenuItem<String>(
+              value: x.value,
+              child: Text(
+                x.label,
+                style: const TextStyle(color: AppColors.text),
+              ),
+            ),
           )
           .toList(),
       onChanged: (v) => onChanged(v ?? ''),
@@ -436,14 +459,14 @@ class _AnimalRow extends StatelessWidget {
   });
 
   Color _badgeColorTipo() {
-    if (animal.tipo == 'EQUINO') return const Color(0xFF00E5FF);
-    return const Color(0xFF00D084);
+    if (animal.tipo == 'EQUINO') return AppColors.greenDeep;
+    return AppColors.brownDeep;
   }
 
   Color _badgeColorEstatus() {
-    if (animal.estatus == 'ACTIVO') return const Color(0xFF00D084);
-    if (animal.estatus == 'BAJA') return const Color(0xFFFF6B6B);
-    return const Color(0xFFFFD166);
+    if (animal.estatus == 'ACTIVO') return AppColors.greenDeep;
+    if (animal.estatus == 'BAJA') return AppColors.red;
+    return AppColors.brown;
   }
 
   String _labelTipo() {
@@ -465,8 +488,8 @@ class _AnimalRow extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x24FFFFFF)),
-        color: const Color(0x0AFFFFFF),
+        border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.22)),
+        color: AppColors.whiteWarm.withValues(alpha: 0.58),
       ),
       child: Column(
         children: [
@@ -478,13 +501,15 @@ class _AnimalRow extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0x24FFFFFF)),
-                  color: const Color(0x0AFFFFFF),
+                  border: Border.all(
+                    color: AppColors.creamStroke.withValues(alpha: 0.22),
+                  ),
+                  color: AppColors.creamStrong.withValues(alpha: 0.82),
                 ),
                 child: Text(
                   '$index',
                   style: const TextStyle(
-                    color: Color(0xFFF3F7FF),
+                    color: AppColors.text,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -496,7 +521,7 @@ class _AnimalRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFFF3F7FF),
+                    color: AppColors.text,
                     fontWeight: FontWeight.w900,
                     fontSize: 14.6,
                   ),
@@ -564,8 +589,8 @@ class _Meta extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x24FFFFFF)),
-        color: const Color(0x0AFFFFFF),
+        border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.20)),
+        color: AppColors.creamStrong.withValues(alpha: 0.62),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -573,7 +598,7 @@ class _Meta extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0x88FFFFFF),
+              color: AppColors.muted,
               fontWeight: FontWeight.w800,
               fontSize: 11.8,
             ),
@@ -584,7 +609,7 @@ class _Meta extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Color(0xFFF3F7FF),
+              color: AppColors.text,
               fontWeight: FontWeight.w800,
               fontSize: 13.2,
             ),
@@ -607,8 +632,8 @@ class _Badge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.45)),
-        color: color.withValues(alpha: 0.16),
+        border: Border.all(color: color.withValues(alpha: 0.34)),
+        color: color.withValues(alpha: 0.10),
       ),
       child: Text(
         text,
@@ -635,7 +660,7 @@ class _ActionIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color c = danger ? const Color(0xFFFF6B6B) : const Color(0xFFF3F7FF);
+    final Color c = danger ? AppColors.red : AppColors.brownDeep;
 
     return InkWell(
       onTap: onTap,
@@ -647,9 +672,13 @@ class _ActionIcon extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: danger ? const Color(0x26FF6B6B) : const Color(0x24FFFFFF),
+            color: danger
+                ? AppColors.red.withValues(alpha: 0.28)
+                : AppColors.creamStroke.withValues(alpha: 0.20),
           ),
-          color: danger ? const Color(0x14FF6B6B) : const Color(0x0AFFFFFF),
+          color: danger
+              ? AppColors.redSoft.withValues(alpha: 0.68)
+              : AppColors.whiteWarm.withValues(alpha: 0.62),
         ),
         child: Icon(icon, color: c),
       ),
@@ -678,9 +707,9 @@ class _PaginationBar extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            'Página $currentPage de $lastPage • Total $total',
+            'Pagina $currentPage de $lastPage - Total $total',
             style: const TextStyle(
-              color: Color(0xB6FFFFFF),
+              color: AppColors.muted,
               fontWeight: FontWeight.w800,
               fontSize: 12.6,
             ),
@@ -689,14 +718,16 @@ class _PaginationBar extends StatelessWidget {
         IconButton(
           onPressed: onPrev,
           icon: const Icon(Icons.chevron_left_rounded),
-          color: const Color(0xFFF3F7FF),
+          color: AppColors.brownDeep,
         ),
         IconButton(
           onPressed: onNext,
           icon: const Icon(Icons.chevron_right_rounded),
-          color: const Color(0xFFF3F7FF),
+          color: AppColors.brownDeep,
         ),
       ],
     );
   }
 }
+
+

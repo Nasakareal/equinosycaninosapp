@@ -1,115 +1,80 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../core/routes.dart';
 
-class WelcomeScreen extends StatelessWidget {
+import '../core/app_theme.dart';
+import '../core/routes.dart';
+import '../services/auth_service.dart';
+import '../widgets/home/app_background.dart';
+import '../widgets/home/glass.dart';
+
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _checkingSession = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreSession();
+  }
+
+  Future<void> _restoreSession() async {
+    final token = await AuthService().getToken();
+    if (!mounted) return;
+
+    if (token != null && token.trim().isNotEmpty) {
+      Navigator.pushReplacementNamed(context, Routes.home);
+      return;
+    }
+
+    setState(() => _checkingSession = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          const _Background(),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const _TopBar(),
-                  const SizedBox(height: 18),
-                  _HeroCard(
-                    onLogin: () {
-                      Navigator.pushNamed(context, Routes.login);
-                    },
-                  ),
-                  const SizedBox(height: 14),
-                  const _GlassInfo(
-                    title: 'Uso interno',
-                    body:
-                        'Acceso restringido para operación. Inicia sesión para continuar.',
-                    pills: [
-                      _PillData(
-                        icon: Icons.lock_outline_rounded,
-                        label: 'Restringido',
+      body: AppBackground(
+        child: SafeArea(
+          child: _checkingSession
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const _TopBar(),
+                      const SizedBox(height: 18),
+                      _HeroCard(
+                        onLogin: () {
+                          Navigator.pushNamed(context, Routes.login);
+                        },
                       ),
-                      _PillData(
-                        icon: Icons.verified_user_outlined,
-                        label: 'Operativo',
+                      const SizedBox(height: 14),
+                      const _GlassInfo(
+                        title: 'Uso interno',
+                        body:
+                            'Acceso restringido para operacion. Inicia sesion para continuar.',
+                        pills: [
+                          _PillData(
+                            icon: Icons.lock_outline_rounded,
+                            label: 'Restringido',
+                          ),
+                          _PillData(
+                            icon: Icons.verified_user_outlined,
+                            label: 'Operativo',
+                          ),
+                          _PillData(icon: Icons.security_outlined, label: 'SSP'),
+                        ],
                       ),
-                      _PillData(icon: Icons.security_outlined, label: 'SSP'),
+                      const SizedBox(height: 14),
+                      _Footer(year: DateTime.now().year),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  _Footer(year: DateTime.now().year),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Background extends StatelessWidget {
-  const _Background();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF070B16), Color(0xFF0A1228)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: const Stack(
-        children: [
-          _RadialGlow(
-            alignment: Alignment(-0.75, -0.95),
-            color: Color(0x337C4DFF),
-            radius: 340,
-          ),
-          _RadialGlow(
-            alignment: Alignment(0.90, -0.92),
-            color: Color(0x3300E5FF),
-            radius: 320,
-          ),
-          _RadialGlow(
-            alignment: Alignment(0.15, 1.05),
-            color: Color(0x2600D084),
-            radius: 420,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RadialGlow extends StatelessWidget {
-  final Alignment alignment;
-  final Color color;
-  final double radius;
-
-  const _RadialGlow({
-    required this.alignment,
-    required this.color,
-    required this.radius,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: Container(
-        width: radius,
-        height: radius,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(colors: [color, Colors.transparent]),
+                ),
         ),
       ),
     );
@@ -121,7 +86,7 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Glass(
+    return Glass(
       radius: 18,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Row(
@@ -133,16 +98,18 @@ class _TopBar extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               gradient: const LinearGradient(
-                colors: [Color(0x3D00E5FF), Color(0x3D7C4DFF)],
+                colors: [Color(0xFFE8DDC8), Color(0xFFD8CFBC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: const Color(0x2EFFFFFF)),
-              boxShadow: const [
+              border: Border.all(
+                color: AppColors.creamStroke.withValues(alpha: 0.24),
+              ),
+              boxShadow: [
                 BoxShadow(
                   blurRadius: 24,
-                  offset: Offset(0, 10),
-                  color: Color(0x33000000),
+                  offset: const Offset(0, 10),
+                  color: AppColors.text.withValues(alpha: 0.12),
                 ),
               ],
             ),
@@ -162,7 +129,7 @@ class _TopBar extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Color(0xFFF3F7FF),
+                    color: AppColors.text,
                     fontWeight: FontWeight.w900,
                     fontSize: 15.4,
                     letterSpacing: 0.2,
@@ -170,11 +137,11 @@ class _TopBar extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'SSP Michoacán • App Operativa',
+                  'SSP Michoacan - App operativa',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Color(0x88FFFFFF),
+                    color: AppColors.muted,
                     fontSize: 12.2,
                     fontWeight: FontWeight.w600,
                   ),
@@ -195,50 +162,49 @@ class _HeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _HeroSurface(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _Kicker(icon: Icons.shield_rounded, text: 'Acceso seguro'),
-            const SizedBox(height: 14),
-            Center(child: _LogoHero()),
-            const SizedBox(height: 14),
-            const Text(
-              'Inicio de sesión requerido',
-              style: TextStyle(
-                color: Color(0xFFF3F7FF),
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-                height: 1.10,
-                letterSpacing: -0.2,
-              ),
+    return Glass(
+      radius: 24,
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _Kicker(icon: Icons.shield_rounded, text: 'Acceso seguro'),
+          const SizedBox(height: 14),
+          Center(child: _LogoHero()),
+          const SizedBox(height: 14),
+          const Text(
+            'Inicio de sesion requerido',
+            style: TextStyle(
+              color: AppColors.text,
+              fontWeight: FontWeight.w900,
+              fontSize: 22,
+              height: 1.10,
+              letterSpacing: -0.2,
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Esta aplicación es de uso interno. Ingresa con tus credenciales para continuar.',
-              style: TextStyle(
-                color: Color(0xB6FFFFFF),
-                fontSize: 13.8,
-                height: 1.45,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Esta aplicacion es de uso interno. Ingresa con tus credenciales para continuar.',
+            style: TextStyle(
+              color: AppColors.muted,
+              fontSize: 13.8,
+              height: 1.45,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _GlowButton(
-                    label: 'Iniciar sesión',
-                    icon: Icons.login_rounded,
-                    onTap: onLogin,
-                  ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _CreamButton(
+                  label: 'Iniciar sesion',
+                  icon: Icons.login_rounded,
+                  onTap: onLogin,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -253,17 +219,20 @@ class _LogoHero extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: const Color(0x33FFFFFF)),
-        gradient: const LinearGradient(
-          colors: [Color(0x18FFFFFF), Color(0x0AFFFFFF)],
+        border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.24)),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.whiteWarm.withValues(alpha: 0.82),
+            AppColors.creamStrong.withValues(alpha: 0.74),
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            blurRadius: 60,
-            offset: Offset(0, 22),
-            color: Color(0x4D000000),
+            blurRadius: 40,
+            offset: const Offset(0, 18),
+            color: AppColors.text.withValues(alpha: 0.10),
           ),
         ],
       ),
@@ -271,10 +240,13 @@ class _LogoHero extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [Color(0x2200E5FF), Colors.transparent],
+                  colors: [
+                    AppColors.green.withValues(alpha: 0.18),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
@@ -292,108 +264,6 @@ class _LogoHero extends StatelessWidget {
   }
 }
 
-class _HeroSurface extends StatelessWidget {
-  final Widget child;
-
-  const _HeroSurface({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 50,
-            offset: Offset(0, 18),
-            color: Color(0x73000000),
-          ),
-        ],
-        gradient: const LinearGradient(
-          colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(-0.7, -0.5),
-                    radius: 1.2,
-                    colors: [Color(0x1400E5FF), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(0.8, -0.7),
-                    radius: 1.3,
-                    colors: [Color(0x147C4DFF), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: child,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Glass extends StatelessWidget {
-  final double radius;
-  final EdgeInsets padding;
-  final Widget child;
-
-  const _Glass({
-    required this.radius,
-    required this.padding,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: const Color(0x24FFFFFF)),
-            gradient: const LinearGradient(
-              colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
 class _Kicker extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -402,19 +272,23 @@ class _Kicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Glass(
-      radius: 999,
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppColors.green.withValues(alpha: 0.24)),
+        color: AppColors.green.withValues(alpha: 0.12),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF00E5FF), size: 18),
+          Icon(icon, color: AppColors.greenDeep, size: 18),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
               text,
               style: const TextStyle(
-                color: Color(0xB8FFFFFF),
+                color: AppColors.greenDeep,
                 fontSize: 12.8,
                 fontWeight: FontWeight.w800,
               ),
@@ -439,7 +313,7 @@ class _GlassInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Glass(
+    return Glass(
       radius: 18,
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -448,7 +322,7 @@ class _GlassInfo extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFFF3F7FF),
+              color: AppColors.text,
               fontWeight: FontWeight.w900,
               fontSize: 15.5,
             ),
@@ -457,7 +331,7 @@ class _GlassInfo extends StatelessWidget {
           Text(
             body,
             style: const TextStyle(
-              color: Color(0xA8FFFFFF),
+              color: AppColors.muted,
               fontSize: 13.2,
               height: 1.4,
               fontWeight: FontWeight.w600,
@@ -493,18 +367,18 @@ class _Pill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x24FFFFFF)),
-        color: const Color(0x0AFFFFFF),
+        border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.20)),
+        color: AppColors.whiteWarm.withValues(alpha: 0.62),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(p.icon, size: 16, color: const Color(0xB8FFFFFF)),
+          Icon(p.icon, size: 16, color: AppColors.brownDeep),
           const SizedBox(width: 7),
           Text(
             p.label,
             style: const TextStyle(
-              color: Color(0xB8FFFFFF),
+              color: AppColors.text,
               fontWeight: FontWeight.w800,
               fontSize: 12.2,
             ),
@@ -515,12 +389,12 @@ class _Pill extends StatelessWidget {
   }
 }
 
-class _GlowButton extends StatelessWidget {
+class _CreamButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
 
-  const _GlowButton({
+  const _CreamButton({
     required this.label,
     required this.icon,
     required this.onTap,
@@ -534,29 +408,29 @@ class _GlowButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x24FFFFFF)),
+          border: Border.all(color: AppColors.brown.withValues(alpha: 0.16)),
           gradient: const LinearGradient(
-            colors: [Color(0x2900E5FF), Color(0x297C4DFF)],
+            colors: [Color(0xFFA47754), Color(0xFF6F4E38)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              blurRadius: 30,
-              offset: Offset(0, 14),
-              color: Color(0x4D000000),
+              blurRadius: 24,
+              offset: const Offset(0, 14),
+              color: AppColors.brownDeep.withValues(alpha: 0.22),
             ),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: const Color(0xFFF3F7FF), size: 18),
+            Icon(icon, color: AppColors.whiteWarm, size: 18),
             const SizedBox(width: 8),
             Text(
               label,
               style: const TextStyle(
-                color: Color(0xFFF3F7FF),
+                color: AppColors.whiteWarm,
                 fontWeight: FontWeight.w900,
                 fontSize: 13.8,
               ),
@@ -575,13 +449,13 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Glass(
+    return Glass(
       radius: 18,
       padding: const EdgeInsets.all(14),
       child: Text(
-        '© $year • Equinos y Caninos • SSP Michoacán',
+        '(c) $year - Equinos y Caninos - SSP Michoacan',
         style: const TextStyle(
-          color: Color(0xA6FFFFFF),
+          color: AppColors.muted,
           fontSize: 12.6,
           fontWeight: FontWeight.w700,
         ),
