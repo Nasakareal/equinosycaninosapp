@@ -31,6 +31,14 @@ class OptionItem {
     );
   }
 
+  factory OptionItem.fromAnimalJson(Map<String, dynamic> json) {
+    return OptionItem(
+      id: _toInt(json['id']),
+      label: (json['nombre'] ?? 'Sin animal').toString(),
+      subtitle: json['especialidad']?.toString(),
+    );
+  }
+
   factory OptionItem.fromTurnoJson(Map<String, dynamic> json) {
     return OptionItem(
       id: _toInt(json['id']),

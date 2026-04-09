@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_theme.dart';
 import '../../core/routes.dart';
+import '../../models/auth_user.dart';
+import '../../services/auth_service.dart';
 import 'glass.dart';
 
 enum AnimalFilter { all, equinos, caninos }
@@ -24,9 +26,25 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
   bool _animalsOpen = false;
   bool _personalOpen = false;
   bool _equinoterapiaOpen = false;
+  bool _serviciosOpen = false;
+  AuthUser? _authUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAuthUser();
+  }
+
+  Future<void> _loadAuthUser() async {
+    final authUser = await AuthService().resolveCurrentUser();
+    if (!mounted) return;
+    setState(() => _authUser = authUser);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final canViewConfiguraciones = _authUser?.canViewConfiguraciones ?? false;
+
     return Drawer(
       backgroundColor: Colors.transparent,
       child: SafeArea(
@@ -39,7 +57,10 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: const LinearGradient(
@@ -51,7 +72,10 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.dashboard_customize_rounded, color: AppColors.brownDeep),
+                      Icon(
+                        Icons.dashboard_customize_rounded,
+                        color: AppColors.brownDeep,
+                      ),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -141,7 +165,8 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
                   icon: Icons.volunteer_activism_rounded,
                   title: 'Equinoterapias',
                   open: _equinoterapiaOpen,
-                  onTap: () => setState(() => _equinoterapiaOpen = !_equinoterapiaOpen),
+                  onTap: () =>
+                      setState(() => _equinoterapiaOpen = !_equinoterapiaOpen),
                 ),
                 if (_equinoterapiaOpen) ...[
                   const SizedBox(height: 8),
@@ -154,7 +179,45 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
                     },
                   ),
                 ],
+                const SizedBox(height: 10),
+                _SectionTile(
+                  icon: Icons.assignment_rounded,
+                  title: 'Servicios',
+                  open: _serviciosOpen,
+                  onTap: () => setState(() => _serviciosOpen = !_serviciosOpen),
+                ),
+                if (_serviciosOpen) ...[
+                  const SizedBox(height: 8),
+                  _SubMenuTile(
+                    icon: Icons.fact_check_rounded,
+                    title: 'Ver servicios',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.serviciosIndex);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _SubMenuTile(
+                    icon: Icons.assignment_ind_rounded,
+                    title: 'Mis servicios',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.misServiciosIndex);
+                    },
+                  ),
+                ],
                 const Spacer(),
+                if (canViewConfiguraciones) ...[
+                  _BottomMenuTile(
+                    icon: Icons.settings_rounded,
+                    title: 'Configuraciones',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Routes.configuracion);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 const Text(
                   'Uso interno • SSP Michoacan',
                   textAlign: TextAlign.center,
@@ -167,6 +230,65 @@ class _HomeLeftDrawerState extends State<HomeLeftDrawer> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomMenuTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _BottomMenuTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFA47754), Color(0xFF6F4E38)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 18,
+              offset: const Offset(0, 10),
+              color: AppColors.brownDeep.withValues(alpha: 0.18),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.whiteWarm),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.whiteWarm,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14.2,
+                ),
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 18,
+              color: AppColors.whiteWarm,
+            ),
+          ],
         ),
       ),
     );
@@ -195,7 +317,9 @@ class _SectionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.creamStroke.withValues(alpha: 0.24)),
+          border: Border.all(
+            color: AppColors.creamStroke.withValues(alpha: 0.24),
+          ),
           color: AppColors.whiteWarm.withValues(alpha: 0.58),
         ),
         child: Row(
@@ -257,7 +381,11 @@ class _SubMenuTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? AppColors.greenDeep : AppColors.brownDeep, size: 20),
+            Icon(
+              icon,
+              color: selected ? AppColors.greenDeep : AppColors.brownDeep,
+              size: 20,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

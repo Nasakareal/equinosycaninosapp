@@ -1,5 +1,6 @@
-package com.example.equinos_caninos_app
+package com.nasaka.equinoscaninos
 
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()
+
